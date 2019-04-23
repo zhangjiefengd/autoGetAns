@@ -2700,20 +2700,14 @@ function media() {
 			'type': 3
 		}
 		submitDot(param ,"doWkMediaPj","doWkMediaPj");
-		mediaBox[i].getElementsByClassName('BT_ping')[0].innerText = '已评价'
-		mediaBox[i].getElementsByClassName('BT_ping')[0].className = "BT_ping Ped"
 	}
-	var judged = document.getElementsByClassName('Ped')
-	if (judged.length !== mediaBox.length) {
-		media()
-	} else {
-		return true
-	}
+	
 }
 
 var urls = document.getElementsByClassName("bookNav_list")[0].getElementsByTagName("a"), index = 0
 
 function addNum() {
+	
 	for (let i = 0; i < urls.length; i++) {
 		if (urls[i].href == window.location.href) {
 			index = i
@@ -2721,19 +2715,29 @@ function addNum() {
 		}
 	}
 	// 动态插入的需延迟执行
-	var completeMedia = false
+	var listen = {
+		set: function(obj, prop, value) {
+			console.log(obj, prop, value)
+			if (prop === 'isComplete' && value && index < urls.length - 1) {
+				index += 1
+				window.location.href = urls[index].href
+			}
+		}
+	}
+	var completeMedia = new Proxy({}, listen)
+	completeMedia.isComplete = false
+
 	setTimeout( () => {
+		var mediaBox = document.getElementsByClassName("Mshow")
+		var judged = document.getElementsByClassName('Ped')
+		console.log(judged.length, mediaBox.length)
+		if (judged.length < mediaBox.length) {
+			media()
+		} else {
+			completeMedia.isComplete =  true
+		}
 		getans()
-		completeMedia = media()
 	}, 800)
 	
-	if (index < urls.length - 1) {
-		setTimeout(jump, 2000)
-	}
-	function jump() {
-		if (!completeMedia) jump()
-		index += 1
-		window.location.href = urls[index].href
-	}
 }
 addNum()
